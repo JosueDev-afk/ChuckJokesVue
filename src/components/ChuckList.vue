@@ -9,12 +9,32 @@ const onImgError = (e: Event) => {
   img.onerror = null
   img.src = fallbackSrc
 }
+
+const emit = defineEmits<{
+  (e: 'select', joke: ChuckJoke, index: number): void
+}>()
+
+const onCardClick = (joke: ChuckJoke, index: number) => emit('select', joke, index)
+const onCardKeydown = (event: KeyboardEvent, joke: ChuckJoke, index: number) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    emit('select', joke, index)
+  }
+}
 </script>
 
 <template>
   <section class="list" aria-label="Chuck Norris jokes">
     <ul>
-      <li v-for="(joke, index) in props.jokes" :key="index" class="card" role="article">
+      <li
+        v-for="(joke, index) in props.jokes"
+        :key="joke.value"
+        class="card interactive"
+        role="article"
+        tabindex="0"
+        @click="onCardClick(joke, index)"
+        @keydown="onCardKeydown($event, joke, index)"
+      >
         <figure class="figure">
           <img
             class="avatar"
@@ -63,6 +83,16 @@ ul {
   width: 100%;
   max-width: 420px;
   text-align: center;
+}
+
+.card.interactive {
+  cursor: pointer;
+  outline: none;
+}
+
+.card.interactive:focus-visible {
+  box-shadow: 0 0 0 3px hsla(160, 100%, 37%, 0.35);
+  transform: none;
 }
 
 .card:hover {

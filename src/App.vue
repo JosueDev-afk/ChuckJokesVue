@@ -16,6 +16,31 @@ const chuck: ChuckJoke[] = [
   { icon_url: iconUrl, value: 'Time waits for no man. Unless that man is Chuck Norris.' },
   { icon_url: iconUrl, value: 'If you spell Chuck Norris in Scrabble, you win. Forever.' },
 ]
+
+import { ref } from 'vue'
+const notification = ref<string | null>(null)
+let hideTimer: number | null = null
+
+async function handleSelect(joke: ChuckJoke, index: number) {
+  const text = joke.value
+  try {
+    if ('clipboard' in navigator && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const ta = document.createElement('textarea')
+      ta.value = text
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+    }
+    notification.value = 'Chiste copiado al portapapeles'
+  } catch {
+    notification.value = 'No se pudo copiar. Intenta manualmente.'
+  }
+  if (hideTimer) window.clearTimeout(hideTimer)
+  hideTimer = window.setTimeout(() => (notification.value = null), 2000)
+}
 </script>
 
 <template>
@@ -26,7 +51,8 @@ const chuck: ChuckJoke[] = [
     </header>
 
     <main>
-      <ChuckList :jokes="chuck" />
+      <ChuckList :jokes="chuck" @select="handleSelect" />
+      <div v-if="notification" class="toast">{{ notification }}</div>
     </main>
   </section>
 </template>
@@ -57,5 +83,19 @@ h1 {
 .subtitle {
   color: var(--color-text);
   opacity: 0.8;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  color: var(--color-text);
+  z-index: 1000;
 }
 </style>
