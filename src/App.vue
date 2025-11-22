@@ -50,9 +50,11 @@ async function handleSelect(joke: ChuckJoke, index: number) {
       <p class="subtitle">Colección minimalista de chistes</p>
     </header>
 
-    <main>
+    <main class="page">
       <ChuckList :jokes="chuck" @select="handleSelect" />
-      <div v-if="notification" class="toast">{{ notification }}</div>
+      <Transition name="toast">
+        <div v-if="notification" class="toast">{{ notification }}</div>
+      </Transition>
     </main>
   </section>
 </template>
@@ -97,5 +99,23 @@ h1 {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   color: var(--color-text);
   z-index: 1000;
+}
+
+/* Animación para el toast */
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter-active,
+  .toast-leave-active {
+    transition: none;
+  }
 }
 </style>

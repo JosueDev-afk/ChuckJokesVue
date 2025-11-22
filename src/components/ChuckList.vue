@@ -25,16 +25,8 @@ const onCardKeydown = (event: KeyboardEvent, joke: ChuckJoke, index: number) => 
 
 <template>
   <section class="list" aria-label="Chuck Norris jokes">
-    <ul>
-      <li
-        v-for="(joke, index) in props.jokes"
-        :key="joke.value"
-        class="card interactive"
-        role="article"
-        tabindex="0"
-        @click="onCardClick(joke, index)"
-        @keydown="onCardKeydown($event, joke, index)"
-      >
+    <TransitionGroup name="list" tag="ul" role="list">
+      <li v-for="(joke, index) in props.jokes" :key="joke.value" class="card" role="listitem">
         <figure class="figure">
           <img
             class="avatar"
@@ -47,7 +39,7 @@ const onCardKeydown = (event: KeyboardEvent, joke: ChuckJoke, index: number) => 
           <figcaption class="text">{{ joke.value }}</figcaption>
         </figure>
       </li>
-    </ul>
+    </TransitionGroup>
   </section>
   
 </template>
@@ -130,6 +122,29 @@ ul {
   .avatar {
     width: 72px;
     height: 72px;
+  }
+}
+
+/* Transiciones para la lista (TransitionGroup) */
+.list-enter-active,
+.list-leave-active {
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+/* Movimiento suave cuando cambia el orden */
+.list-move {
+  transition: transform 250ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-enter-active,
+  .list-leave-active,
+  .list-move {
+    transition: none;
   }
 }
 </style>
